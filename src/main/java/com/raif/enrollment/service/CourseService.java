@@ -40,4 +40,9 @@ public class CourseService {
     public boolean hasCourses() {
         return !courses.isEmpty();
     }
+
+    public void replaceCourses(List<Course> loadedCourses) {
+        courses.clear();
+        courses.addAll(loadedCourses);
+    }
 }

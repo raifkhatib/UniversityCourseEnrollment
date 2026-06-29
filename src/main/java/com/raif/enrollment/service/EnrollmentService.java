@@ -44,4 +44,9 @@ public class EnrollmentService {
     public boolean hasEnrollments() {
         return !enrollments.isEmpty();
     }
+
+    public void replaceEnrollments(List<Enrollment> loadedEnrollments) {
+        enrollments.clear();
+        enrollments.addAll(loadedEnrollments);
+    }
 }

@@ -5,6 +5,8 @@ package com.raif.enrollment.model;
  * This class demonstrates inheritance because it extends Person.
  */
 public class Student extends Person {
+    private static final long serialVersionUID = 1L;
+
     private String major;
     private int academicYear;
 

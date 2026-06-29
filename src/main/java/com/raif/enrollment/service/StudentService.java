@@ -40,4 +40,9 @@ public class StudentService {
     public boolean hasStudents() {
         return !students.isEmpty();
     }
+
+    public void replaceStudents(List<Student> loadedStudents) {
+        students.clear();
+        students.addAll(loadedStudents);
+    }
 }

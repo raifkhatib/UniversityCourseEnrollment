@@ -1,11 +1,15 @@
 package com.raif.enrollment.model;
 
+import java.io.Serializable;
+
 /**
  * Represents a university course.
  * This class uses encapsulation by keeping fields private
  * and exposing controlled access through methods.
  */
-public class Course {
+public class Course implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final String code;
     private String title;
     private int credits;

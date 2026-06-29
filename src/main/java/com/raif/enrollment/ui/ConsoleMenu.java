@@ -6,8 +6,11 @@ import com.raif.enrollment.model.Student;
 import com.raif.enrollment.service.CourseService;
 import com.raif.enrollment.service.EnrollmentService;
 import com.raif.enrollment.service.StudentService;
+import com.raif.enrollment.storage.DataSnapshot;
+import com.raif.enrollment.storage.FileDataStorage;
 import com.raif.enrollment.util.InputValidator;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -15,19 +18,21 @@ import java.util.Scanner;
 /**
  * Handles the console user interface.
  * This class is responsible for showing the menu, reading user choices,
- * and calling the correct service classes.
+ * and calling the correct service or storage classes.
  */
 public class ConsoleMenu {
     private final Scanner scanner;
     private final StudentService studentService;
     private final CourseService courseService;
     private final EnrollmentService enrollmentService;
+    private final FileDataStorage fileDataStorage;
 
     public ConsoleMenu() {
         this.scanner = new Scanner(System.in);
         this.studentService = new StudentService();
         this.courseService = new CourseService();
         this.enrollmentService = new EnrollmentService();
+        this.fileDataStorage = new FileDataStorage();
     }
 
     public void start() {
@@ -38,7 +43,7 @@ public class ConsoleMenu {
         while (running) {
             printMenu();
 
-            int choice = InputValidator.readIntInRange(scanner, "Choose an option: ", 1, 7);
+            int choice = InputValidator.readIntInRange(scanner, "Choose an option: ", 1, 9);
 
             switch (choice) {
                 case 1:
@@ -60,6 +65,12 @@ public class ConsoleMenu {
                     viewEnrollments();
                     break;
                 case 7:
+                    saveData();
+                    break;
+                case 8:
+                    loadData();
+                    break;
+                case 9:
                     running = false;
                     System.out.println("Exiting application. Goodbye.");
                     break;
@@ -83,7 +94,9 @@ public class ConsoleMenu {
         System.out.println("4. View courses");
         System.out.println("5. Enroll student in course");
         System.out.println("6. View enrollments");
-        System.out.println("7. Exit");
+        System.out.println("7. Save data");
+        System.out.println("8. Load data");
+        System.out.println("9. Exit");
         System.out.println();
     }
 
@@ -209,6 +222,48 @@ public class ConsoleMenu {
 
         for (Enrollment enrollment : enrollments) {
             System.out.println(enrollment);
+        }
+    }
+
+    private void saveData() {
+        System.out.println();
+        System.out.println("--- Save Data ---");
+
+        DataSnapshot snapshot = new DataSnapshot(
+                studentService.getAllStudents(),
+                courseService.getAllCourses(),
+                enrollmentService.getAllEnrollments()
+        );
+
+        try {
+            fileDataStorage.save(snapshot);
+            System.out.println("Data saved successfully to: " + fileDataStorage.getDataFilePath());
+        } catch (IOException error) {
+            System.out.println("Failed to save data: " + error.getMessage());
+        }
+    }
+
+    private void loadData() {
+        System.out.println();
+        System.out.println("--- Load Data ---");
+
+        try {
+            Optional<DataSnapshot> snapshot = fileDataStorage.load();
+
+            if (snapshot.isEmpty()) {
+                System.out.println("No saved data file found.");
+                return;
+            }
+
+            studentService.replaceStudents(snapshot.get().getStudents());
+            courseService.replaceCourses(snapshot.get().getCourses());
+            enrollmentService.replaceEnrollments(snapshot.get().getEnrollments());
+
+            System.out.println("Data loaded successfully from: " + fileDataStorage.getDataFilePath());
+        } catch (IOException error) {
+            System.out.println("Failed to load data: " + error.getMessage());
+        } catch (ClassNotFoundException error) {
+            System.out.println("Saved data format is invalid.");
         }
     }
 }

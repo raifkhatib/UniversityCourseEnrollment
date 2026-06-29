@@ -1,5 +1,6 @@
 package com.raif.enrollment.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
@@ -7,7 +8,9 @@ import java.time.LocalDate;
  * This class demonstrates composition because it contains
  * a Student object and a Course object.
  */
-public class Enrollment {
+public class Enrollment implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Student student;
     private final Course course;
     private final LocalDate enrollmentDate;
